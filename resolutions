@@ -1,0 +1,37 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from datetime import datetime
+import os
+import chromedriver_autoinstaller
+
+chromedriver_autoinstaller.install()
+
+website_urls = ["https://maps.google.com", "https://example.com/page2"]  # Different URLs for testing
+
+resolutions = {
+    "Desktop": ["1920x1080", "1366x768", "1536x864"],
+    "Mobile": ["360x640", "414x896", "375x667"]
+}
+
+output_folder = "screenshots"
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
+for device, resolutions_list in resolutions.items():
+    for resolution in resolutions_list:
+        options = Options()
+
+        width, height = resolution.split("x")
+        options.add_argument(f"--window-size={width},{height}")
+
+        driver = webdriver.Chrome(options=options)
+
+        for url in website_urls:
+            driver.get(url)
+
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            screenshot_name = f"{device}/{resolution}/Chrome_{timestamp}.png"
+            screenshot_path = os.path.join(output_folder, screenshot_name)
+            driver.save_screenshot(screenshot_path)
+
+        driver.quit()
